@@ -1,0 +1,32 @@
+{
+  "name": "web_project_api_full",
+  "version": "1.0.0",
+  "description": "Backend del proyecto: Around The US",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PacoZ2024/web_project_api_full.git"
+  },
+  "keywords": [],
+  "author": "PacoZ",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PacoZ2024/web_project_api_full/issues"
+  },
+  "homepage": "https://github.com/PacoZ2024/web_project_api_full#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "nodemon": "^3.1.11"
+  }
+}
