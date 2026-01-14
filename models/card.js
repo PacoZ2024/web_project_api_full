@@ -1,7 +1,5 @@
+const validator = require('validator');
 const mongoose = require('mongoose');
-
-// eslint-disable-next-line
-const regex = /^https?:\/\/(www\.)?[A-Za-z0-9\._~:\/?%#\[\]@!$&'\(\)\*\+,;=]/;
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -20,10 +18,8 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Se requiere el vínculo a la imagen de la tarjeta'],
     validate: {
-      validator(v) {
-        return regex.test(v);
-      },
-      message: (props) => `La dirección ${props.value} no es una URL válida`,
+      validator: validator.isURL,
+      message: (props) => `La dirección ${props.value} no es de una URL válida`,
     },
   },
   owner: {

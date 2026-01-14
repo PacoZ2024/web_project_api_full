@@ -21,8 +21,11 @@
   },
   "homepage": "https://github.com/PacoZ2024/web_project_api_full#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
-    "mongoose": "^9.0.2"
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.2",
+    "validator": "^13.15.26"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

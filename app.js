@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middleware/auth');
 const usersRoutes = require('./routes/users');
 const cardsRoutes = require('./routes/cards');
 
@@ -11,18 +13,14 @@ mongoose
   .then(() => console.log('Conectado a la base de datos!'))
   .catch((err) => console.error(err));
 app.use(express.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '68e3f880d5ea21d47450f9cc',
-  };
-  next();
-});
-app.use('/users', usersRoutes);
-app.use('/cards', cardsRoutes);
+app.post('/signin', login);
+app.post('/signup', createUser);
+app.use('/users', auth, usersRoutes);
+app.use('/cards', auth, cardsRoutes);
 app.use('/', (req, res) => {
   res.status(404).send({ message: 'Recurso solicitado no encontrado' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`Servidor escuchando en el puerto: ${PORT}`);
 });
