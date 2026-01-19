@@ -18,7 +18,7 @@ app.post('/signin', login);
 app.post('/signup', createUser);
 app.use('/users', auth, usersRoutes);
 app.use('/cards', auth, cardsRoutes);
-app.use('/', (req, res) => {
+app.use('/', () => {
   throw new NotFoundError('Recurso solicitado no encontrado');
 });
 app.use((err, req, res, next) => {
