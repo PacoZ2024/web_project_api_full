@@ -1,58 +1,52 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+const BadRequestError = require('../errors/bad-request-err');
 
-async function getUsersList(req, res) {
+async function getUsersList(req, res, next) {
   await User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: `${err.message}` }));
+    .catch(next);
 }
 
-async function getUserById(req, res) {
+async function getUserById(req, res, next) {
   const { id } = req.params;
-  let ERROR_CODE = 500;
   await User.findById(id)
     .orFail(() => {
-      const error = new Error('No se ha encontrado ningún usuario con ese ID');
-      ERROR_CODE = 404;
-      throw error;
+      throw new NotFoundError('No se ha encontrado ningún usuario con ese ID');
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'ID de usuario inválido' });
-      return res.status(ERROR_CODE).send({ message: `${err.message}` });
-    });
+      if (err.name === 'CastError') throw new BadRequestError('ID de usuario inválido');
+      next(err);
+    })
+    .catch(next);
 }
 
-async function getCurrentUser(req, res) {
-  const userId = req.user._id;
-  let ERROR_CODE = 500;
-  await User.findById(userId)
+async function getCurrentUser(req, res, next) {
+  const userCurrentId = req.user._id;
+  await User.findById(userCurrentId)
     .orFail(() => {
-      const error = new Error('Usuario no encontrado');
-      ERROR_CODE = 404;
-      throw error;
+      throw new NotFoundError('Usuario no encontrado');
     })
     .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      res.status(ERROR_CODE).send({ message: `${err.message}` });
-    });
+    .catch(next);
 }
 
-async function createUser(req, res) {
+async function createUser(req, res, next) {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  let ERROR_CODE = 500;
   if (!password) {
-    return res.status(400).send({ message: 'Se requiere una contraseña' });
+    throw new BadRequestError('Se requiere una contraseña');
   }
   if (password.length < 8) {
-    return res.status(400).send({
-      message: 'La longitud mínima de la contraseña es de ocho caracteres',
-    });
+    throw new BadRequestError(
+      'La longitud mínima de la contraseña debe ser de al menos ocho caracteres',
+    );
   }
-  return bcrypt
+  await bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
       email,
@@ -69,58 +63,55 @@ async function createUser(req, res) {
       avatar: user.avatar,
     }))
     .catch((err) => {
-      if (err.name === 'ValidationError') ERROR_CODE = 400;
-      res.status(ERROR_CODE).send({ message: `${err.message}` });
-    });
+      if (err.name === 'ValidationError') throw new BadRequestError(err.message);
+      next(err);
+    })
+    .catch(next);
 }
 
-async function updateUser(req, res) {
+async function updateUser(req, res, next) {
   const currentUserId = req.user._id;
   const { name, about } = req.body;
-  let ERROR_CODE = 500;
   await User.findByIdAndUpdate(
     currentUserId,
     { name, about },
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      const error = new Error(
-        'No se realizó la actualización del perfil porque no se encontró el ID del usuario',
+      throw new NotFoundError(
+        'No se actualizó el perfil del usuario porque no se encontró el ID',
       );
-      ERROR_CODE = 404;
-      throw error;
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') ERROR_CODE = 400;
-      res.status(ERROR_CODE).send({ message: `${err.message}` });
-    });
+      if (err.name === 'ValidationError') throw new BadRequestError(err.message);
+      next(err);
+    })
+    .catch(next);
 }
 
-async function updateAvatar(req, res) {
+async function updateAvatar(req, res, next) {
   const currentUserId = req.user._id;
   const { avatar } = req.body;
-  let ERROR_CODE = 500;
   await User.findByIdAndUpdate(
     currentUserId,
     { avatar },
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      const error = new Error(
-        'No se realizó la actualización del avatar porque no se encontró el ID del usuario',
+      throw new NotFoundError(
+        'No se actualizó la imagen de perfil del usuario porque no se encontró el ID',
       );
-      ERROR_CODE = 404;
-      throw error;
     })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') ERROR_CODE = 400;
-      res.status(ERROR_CODE).send({ message: `${err.message}` });
-    });
+      if (err.name === 'ValidationError') throw new BadRequestError(err.message);
+      next(err);
+    })
+    .catch(next);
 }
 
-async function login(req, res) {
+async function login(req, res, next) {
   const { email, password } = req.body;
   await User.findUserByCredentials(email, password)
     .then((user) => {
@@ -129,9 +120,7 @@ async function login(req, res) {
       });
       res.send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: `${err.message}` });
-    });
+    .catch(next);
 }
 
 module.exports = {
