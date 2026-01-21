@@ -11,8 +11,8 @@ async function getUsersList(req, res, next) {
 }
 
 async function getUserById(req, res, next) {
-  const { id } = req.params;
-  await User.findById(id)
+  const { userId } = req.params;
+  await User.findById(userId)
     .orFail(() => {
       throw new NotFoundError('No se ha encontrado ningún usuario con ese ID');
     })
@@ -25,8 +25,8 @@ async function getUserById(req, res, next) {
 }
 
 async function getCurrentUser(req, res, next) {
-  const userCurrentId = req.user._id;
-  await User.findById(userCurrentId)
+  const currentUserId = req.user._id;
+  await User.findById(currentUserId)
     .orFail(() => {
       throw new NotFoundError('Usuario no encontrado');
     })
@@ -38,14 +38,14 @@ async function createUser(req, res, next) {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!password) {
-    throw new BadRequestError('Se requiere una contraseña');
-  }
+  if (!password) throw new BadRequestError('Se requiere una contraseña');
+
   if (password.length < 8) {
     throw new BadRequestError(
       'La longitud mínima de la contraseña debe ser de al menos ocho caracteres',
     );
   }
+
   await bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
