@@ -5,7 +5,8 @@ const BadRequestError = require('../errors/bad-request-err');
 const ForbiddenError = require('../errors/forbidden-err');
 
 async function getCardsList(req, res, next) {
-  await Card.find({})
+  const userId = req.user._id;
+  await Card.find({ owner: userId })
     .then((cards) => res.send(cards))
     .catch(next);
 }
