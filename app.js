@@ -14,6 +14,7 @@ const app = express();
 
 const allowedCors = [
   'https://pacosclub.mooo.com',
+  'http://pacosclub.mooo.com',
   'https://api.pacosclub.mooo.com',
   'http://localhost:3000',
 ];
