@@ -13,6 +13,8 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 const allowedCors = [
+  'https://www.pacosclub.mooo.com',
+  'http://www.pacosclub.mooo.com',
   'https://pacosclub.mooo.com',
   'http://pacosclub.mooo.com',
   'https://api.pacosclub.mooo.com',
