@@ -8,9 +8,13 @@ En este proyecto se completa el trabajo en el Back-End con:
 
 ## Características del proyecto
 
+- React
+- React Router
+- Node.js
 - MongoDB
 - Express
-- Node.js
+- GCP (Global Privacy Control)
+- JWT Auth
 - Nodemon (Dev)
 - ESLint (Dev)
 
